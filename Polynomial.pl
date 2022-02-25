@@ -35,6 +35,12 @@ minus([KA|PA], [KB|PB], [KS|PS]) :-
 % ?- minus([5,2],[3],[5,-1]).
 % ?- minus([5],[3],[2]).
 
+horner([], _, 0).
+
+horner([K|P], X, R):-
+	horner(P,X,RA),
+	R is RA * X + K.
+
 %RESTA
 
 %caso primer parametro vacio|
