@@ -3,6 +3,8 @@ degree([K|Poly], N) :-
 degree([_|Poly], N) :- 
   	degree(Poly, N).
 
+plus([],[],[]).
+
 plus([KA|PA], [KB|PB], [KS|PS]) :- 
   	length(PA, NA), length(PB, NB), NA > NB,
 	plus(PA, [KB|PB], PS), KS is KA.
@@ -13,7 +15,12 @@ plus([KA|PA], [KB|PB], [KS|PS]) :-
 
 plus([KA|PA], [KB|PB], [KS|PS]) :- 
   	plus(PA, PB, PS), KS is KA + KB.
-  
+% ?- plus([1,2],[2,3],X).
+% ?- plus([4,8],[5,5],[9,13]).
+
+
+minus([],[],[]).
+
 minus([KA|PA], [KB|PB], [KS|PS]) :- 
 	length(PA, NA), length(PB, NB), NA > NB,
 	minus(PA, [KB|PB], PS), KS is KA.
@@ -25,6 +32,8 @@ minus([KA|PA], [KB|PB], [KS|PS]) :-
 minus([KA|PA], [KB|PB], [KS|PS]) :- 
 	minus(PA, PB, PS), KS is KA - KB.
 
+% ?- minus([5,2],[3],[5,-1]).
+% ?- minus([5],[3],[2]).
 
 %RESTA
 
