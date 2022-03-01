@@ -1,7 +1,13 @@
+%%% José Luis Sandín -- 179706
+%%% Alejandro Cesar Moya --
+%%% Victoria Ordorica Pardo --
+%%% 
+
 %%% Calculates the degree of the polynomial
 
 degree([K|Poly], N) :- 
-  	K \= 0, length(Poly, N).
+  	K \= 0, 
+	length(Poly, N).
 degree([_|Poly], N) :- 
   	degree(Poly, N).
 	
@@ -21,6 +27,7 @@ plus([KA|PA], [KB|PB], [KS|PS]) :-
 
 plus([KA|PA], [KB|PB], [KS|PS]) :- 
   	plus(PA, PB, PS), KS is KA + KB.
+	
 % ?- plus([1,2],[2,3],X).
 % ?- plus([4,8],[5,5],[9,13]).
 
@@ -199,7 +206,7 @@ comp_3([Wa|X], [Wb|Z], [Wc|W]) :-
 % ?- printPoly([3,0,5]).
 % ?- plus([4,3,2,1],[3,0,5],X),printPoly(X).
 % ?- times([4,3,2,1],[3,0,5],X),printPoly(X).
-% ?- composition WIP
+% ?- comp([4,3,2,1],[3,0,5],X).
 % ?- minus([0],[4,3,2,1],X),printPoly(X).
 % ?- evaluate([4,3,2,1],3,X).
 % ?- differentiate([4,3,2,1],X),printPoly(X).
