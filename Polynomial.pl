@@ -140,6 +140,11 @@ spp([K], E, _) :-
     K > 0,
     format(' + ~D', K).
 spp([K|P], E, L) :-
+    L =:= 2,
+    format('~Dx', K),
+    spp(P, E - 1, L),
+    !.
+spp([K|P], E, L) :-
     E =:= 2,
     K > 0,
     format(' + ~Dx', K),
@@ -187,7 +192,7 @@ comp_2(_,[],[]):-
 comp_2(X,[Wb|Z], W) :-
    comp_2(X,Z, Uu), 
    comp_1(X, Wb, Rr), 
-   comp_3(Rr, [0.0|Uu], W), 
+   comp_3(Rr, [0|Uu], W), 
    !. 
 comp_3(X,[],X) :- 
     X = [_|_].
@@ -212,3 +217,23 @@ comp_3([Wa|X], [Wb|Z], [Wc|W]) :-
 % ?- differentiate([4,3,2,1],X),printPoly(X).
 % ?- differentiate([4,3,2,1],X),differentiate(X,Y),printPoly(Y).
 
+main:-
+	write("zero(x)     = 0"),
+	nl,
+	write("p(x)        = "),printPoly([4,3,2,1]),
+	nl,
+	write("q(x)        = "),printPoly([3,0,5]),
+	nl,
+	write("p(x)+q(x)   = "),plus([4,3,2,1],[3,0,5],X), printPoly(X),
+	nl,
+	write("p(x)*q(x)   = "),times([4,3,2,1],[3,0,5],Y),printPoly(Y),
+	nl,
+	write("p(q(x))     = "),comp([4,3,2,1],[3,0,5],C),printPoly(C),
+	nl,
+	write("0-p(x)      = "),minus([0],[4,3,2,1],M),printPoly(M),
+	nl,
+	write("p(3)        = "),evaluate([4,3,2,1],3,B), printPoly(B),
+	nl,
+	write("p`(x)       = "),differentiate([4,3,2,1],D),printPoly(D),
+	nl,
+	write("p``(x)      = "),differentiate([4,3,2,1],R),differentiate(R,J),printPoly(J).
