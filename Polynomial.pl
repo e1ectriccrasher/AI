@@ -164,6 +164,34 @@ spp([K|P], E, L) :-
 % ?- printPoly([-4,-3,2,-1]).
 % ?- printPoly([108,0,567,0,996,0,586]).
 
+comp([],_,[]):-!.
+comp([Wa|X],Z,W):-
+    comp(X,Z,Tr),
+    comp_2(Z,Tr,Pr),
+    comp_3([Wa],Pr,W),
+    !.
+comp_1([],_,[]):-
+    !.
+comp_1([Wa|X], Rr, [Wc|W]) :-
+   Wc is Wa*Rr,
+   comp_1(X, Rr, W).
+comp_2(_,[],[]):-
+    !.
+comp_2(X,[Wb|Z], W) :-
+   comp_2(X,Z, Uu), 
+   comp_1(X, Wb, Rr), 
+   comp_3(Rr, [0.0|Uu], W), 
+   !. 
+comp_3(X,[],X) :- 
+    X = [_|_].
+comp_3([],Z,Z):- 
+    !.
+comp_3([Wa|X], [Wb|Z], [Wc|W]) :-
+   Wc is Wa + Wb,
+   comp_3(X,Z,W).
+
+%?-comp([6,3,1,2],[9,5,3],C).
+
 
 %%% Pruebas polynomials.java
 
