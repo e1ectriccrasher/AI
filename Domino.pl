@@ -5,7 +5,7 @@
 %
 %
 %
-% Falta agregar el comer ficha 
+% Falta agregar el comer ficha
 %Hay  varios SINGLETON VARIABLES que no se como quitar
 %Lo ultimo poner en ingles
 %printGameDetails falta
@@ -37,6 +37,10 @@ draw(State, Current, EndCondition, NewState):-
     nl,
     read(X),
     [Side1, Side2] = X,
+    Side1 < 7,
+    Side1 >= 0,
+    Side2 < 7,
+    Side2 >= 0,
     append([X], Hand, NewHand),			% Add the drawn piece to hand
     delete(Possible, [Side1, Side2], NewPossible), % Remove drawn piece from possible pieces
     delete(NewPossible, [Side2, Side1], NewPossible2),
@@ -68,7 +72,7 @@ enemyTurn(State):-
 
 % Check if we can play and make an optimal move.
 selectMyMove( State ):-
-    %[_, _, Hand] = State,
+    [_, _, Hand] = State,
     % if hand is empty, got to performMyCommand(bla, draw, bla),
 
     % Check if we can play something, if not, performMyCommand(bla, pass, bla),
@@ -77,10 +81,11 @@ selectMyMove( State ):-
 
     % Run alfabeta with that info, getting the best tile we can play
 
-    %genStates(Hand, InterestingMoves),
-    % alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
+    genStates(Hand, InterestingMoves),
+
+    alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
     % Last but not least, perform that command
-    performMyCommand(State, Move).
+    performMyCommand(State, BestMove).
     %printGameDetails(State).
 
 % performMyCommand(State, Side, Move)
@@ -208,8 +213,10 @@ alphabeta( Depth, Alpha, Beta,[ [StatesH_Piece, StatesH_Hand] | StatesT], Storag
 	write("Depth "),
 	write(Depth),
 	write("| "),
+        nl,
 	write("Played: " ),
 	write( StatesH_Piece),
+        nl,
 	write(", Starting alphabeta. "),
 	write("Going to pass: "),
 	write(StatesH_Hand),
@@ -284,7 +291,7 @@ alphabeta( Depth, Alpha, Beta,[ [StatesH_Piece, StatesH_Hand] | StatesT], Storag
 
 % Mock method for the heuristic.
 heuristic(Position):-
-Position = 1.
+    Position = 1.
 
 
 % Create possible states per row:
