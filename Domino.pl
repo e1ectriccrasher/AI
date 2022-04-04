@@ -12,6 +12,8 @@
 %
 /*-------------------- Board & Game Function --------------------*/
 
+:- use_module(library(clpfd)).
+
 % Main predicate:
 startGame():-
     % Create the board State: [Layout, Possible Pieces, userHand]
@@ -83,7 +85,7 @@ selectMyMove( State ):-
 
     genStates(Hand, InterestingMoves),
 
-    alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
+    alphabeta(4, -3000, 3000, InterestingMoves, _ , BestMove, 1);
     % Last but not least, perform that command
     performMyCommand(State, BestMove).
     %printGameDetails(State).
@@ -192,7 +194,7 @@ test:-
 alphabeta(-1, _, _, -, _ , BestMove,_):-
 	% This should call the heuristic function
 	write("Calling heuristic clause: "),nl,nl,
-	heuristic(BestMove).
+	heuristica(BestMove).
 
 
 %There is no more states to explore.
@@ -200,7 +202,7 @@ alphabeta(-1, _, _, -, _ , BestMove,_):-
 alphabeta( _, _, _, [ [_,[]] ], [], BestMove,_):-
 	write("Terminated"),
 	nl,nl,
-	heuristic(BestMove).
+	heuristica(BestMove).
 
 %There is no more states to explore at the same level.
 % Need to remove -3000
@@ -354,10 +356,10 @@ printList([[EntryA | ColumnsA] | RowsA]):-
 	printList([ColumnsA|RowsA]).
 
 % Emulate a loop.
-repeat.
+%repeat.
 
-repeat:-
-	repeat.
+%repeat:-
+	%repeat.
 
 
 % Confirm that the Data passed by the user is valid,
@@ -499,3 +501,18 @@ verifica([X|Cola],Num):-
 %i,o
 verifica2([X|_],Num):-
     X=:=Num.
+
+sum_tile([X|Y], V):-
+    V is X + Y.
+
+sum_list1([], []):- !.
+
+sum_list1([X|R], V):-
+    sum_tile(X, SR),
+    sum_list1(R, V1),
+    V = [SR|V1].
+
+
+zs_max_at(Zs,Max,Pos):-
+    maplist(#>=(Max),Zs),
+    nth0(Pos,Zs,Max).
