@@ -194,7 +194,7 @@ test:-
 alphabeta(-1, _, _, -, _ , BestMove,_):-
 	% This should call the heuristic function
 	write("Calling heuristic clause: "),nl,nl,
-	heuristica(BestMove).
+	heuristic(BestMove).
 
 
 %There is no more states to explore.
@@ -202,7 +202,7 @@ alphabeta(-1, _, _, -, _ , BestMove,_):-
 alphabeta( _, _, _, [ [_,[]] ], [], BestMove,_):-
 	write("Terminated"),
 	nl,nl,
-	heuristica(BestMove).
+	heuristic(BestMove).
 
 %There is no more states to explore at the same level.
 % Need to remove -3000
@@ -404,16 +404,19 @@ relacionMulas(Mano,Res):-
     Count>=2,
     Res is -2;
     Res is 1.
+
 %Cuenta el número de mulas que se tienen llamando al predicado esMula
 %i,o
 mulas([X|Cola], Count):-
     esMula(X,Res),
     mulas(Cola,C1),
     Count is C1+Res.
+
 mulas([],0):-!.
 %Revisa si el primero y segundo numero de la ficha es el mismo,
 %entonces es mula
 %i,o
+
 esMula([X|Cola],Res):-
     segundoNum(Cola,Num),
     X=:=Num,
