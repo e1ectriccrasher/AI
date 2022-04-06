@@ -2,7 +2,8 @@
 % You can start the game using:
 % startGame.
 
-/*-------------------- Board & Game Engine --------------------*/
+
+:- use_module(library(clpfd)).
 
 % Main predicate:
 startGame():-
@@ -29,6 +30,10 @@ draw(State, Current, EndCondition, NewState):-
     nl,
     read(X),
     [Side1, Side2] = X,
+    Side1 < 7,
+    Side1 >= 0,
+    Side2 < 7,
+    Side2 >= 0,
     append([X], Hand, NewHand),			% Add the drawn piece to hand
     delete(Possible, [Side1, Side2], NewPossible), % Remove drawn piece from possible pieces
     delete(NewPossible, [Side2, Side1], NewPossible2),
@@ -59,7 +64,6 @@ enemyTurn(State):-
 /*-------------------- My moves --------------------*/
 
 % Check if we can play and make an optimal move.
-selectMyMove(State):-
 
 	Move = [6,6], %falta agregar el paso de inicio agregar toda la funcionalidad.
     	performMyCommand(State,Move).
@@ -190,8 +194,10 @@ alphabeta( Depth, Alpha, Beta,[ [StatesH_Piece, StatesH_Hand] | StatesT], Storag
 	write("Depth "),
 	write(Depth),
 	write("| "),
+        nl,
 	write("Played: " ),
 	write( StatesH_Piece),
+        nl,
 	write(", Starting alphabeta. "),
 	write("Going to pass: "),
 	write(StatesH_Hand),
@@ -299,6 +305,7 @@ min( X, Y, Z):-
 	!.
 min(_, Y, Y).
 
+
 /*-------------------- Heuristica --------------------*/
 
 %Sum of the score of three different heuristic methods
@@ -320,18 +327,7 @@ relationDT(Hand,Res):-
     Res is -1;
     Res is 1.
 
-%Counts number of double tales on the hand
-%%i,o
-doubleTales([X|Tail], Count):-
-    isDT(X,Res),
-    doubleTales(Tail,C1),
-    Count is C1+Res.
-doubleTales([],0):-!.
 
-%Checks if the two number on the piece are the same
-%%i,o
-isDT([X|Tail],Res):-
-    second(Tail,Num),
     X=:=Num,
     Res is 1;
     Res is 0.
