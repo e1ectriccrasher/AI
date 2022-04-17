@@ -2,15 +2,14 @@
 % You can start the game using:
 % startGame.
 
-
-:- use_module(library(clpfd)).
+/*-------------------- Board & Game Engine --------------------*/
 
 % Main predicate:
 startGame():-
     % Create the board State: [Layout, Possible Pieces, userHand]
     initState(State),
     % Add 7 new pieces to the hand
-    draw(State,0,3, NewState), %Debo cambiar a 7 piezas
+    draw(State,0,7, NewState), %Ask to enter the 7 titles
     % Check whos first and start game.
     chooseTurn(NewState).
 
@@ -30,10 +29,6 @@ draw(State, Current, EndCondition, NewState):-
     nl,
     read(X),
     [Side1, Side2] = X,
-    Side1 < 7,
-    Side1 >= 0,
-    Side2 < 7,
-    Side2 >= 0,
     append([X], Hand, NewHand),			% Add the drawn piece to hand
     delete(Possible, [Side1, Side2], NewPossible), % Remove drawn piece from possible pieces
     delete(NewPossible, [Side2, Side1], NewPossible2),
@@ -64,10 +59,18 @@ enemyTurn(State):-
 /*-------------------- My moves --------------------*/
 
 % Check if we can play and make an optimal move.
-
-	Move = [6,6], %falta agregar el paso de inicio agregar toda la funcionalidad.
+selectMyMove(State):-
+	heuristicAnalysis(State,Res),
+	chooseMove(State,Res,Move),
     	performMyCommand(State,Move).
 
+heuristicAnalysis(Hand,Res):-
+	repeated(Hand,ResRep),
+	relationDT(Hand,ResDT),
+	max(ResRep,ResDT,Res).
+
+chooseMove(State,Res,Move):-
+	
 
 % performMyCommand(State, Side, Move)
 performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
@@ -78,7 +81,7 @@ performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
     insertDomino( [Side1, Side2], Layout, NewLayout),
     format("I placed ~w.~n", [[Side1,Side2]] ),
     % Start enemyTurn with the new State
-    enemyTurn([NewLayout, Possible, NewHand2]). %Falla
+    enemyTurn([NewLayout, Possible, NewHand2]).
 
 /*-------------------- Enemy Moves--------------------*/
 % Manage the enemy turn
@@ -158,46 +161,16 @@ deleteListFromList(List1, [L2H |L2T], Result):-
 	delete(SubResult, L2H, Result). 
 
 /*-------------------- Alphabeta --------------------*/
-test:-
-	genStates([1,2,3], PossibleHands),
-	write("PossibleHands are: "),
-	write(PossibleHands),
-	nl,
-	alphabeta(4, -3000, 3000, PossibleHands, [4,5] , BestMove, 0),
-	nl,nl,nl,
-	write("Result is: "),
-	write( BestMove),
-	write(".").
-
-% Depth is 0
-alphabeta(-1, _, _, -, _ , BestMove,_):-
-	% This should call the heuristic function
-	write("Calling heuristic clause: "),nl,nl,
-	heuristic(BestMove).
 
 
-%There is no more states to explore.
-% X is the last piece the player can place.
-alphabeta( _, _, _, [ [_,[]] ], [], BestMove,_):-
-	write("Terminated"),
-	nl,nl,
-	heuristic(BestMove).
-
-%There is no more states to explore at the same level.
-% Need to remove -3000
-alphabeta( _, _, _, [], _, BestMove,_):-
-	BestMove is -543231,
-	write("Reached end of line").
 
 % Main alphabeta method (for the user)
 alphabeta( Depth, Alpha, Beta,[ [StatesH_Piece, StatesH_Hand] | StatesT], Storage, BestMove,0):-
 	write("Depth "),
 	write(Depth),
 	write("| "),
-        nl,
 	write("Played: " ),
 	write( StatesH_Piece),
-        nl,
 	write(", Starting alphabeta. "),
 	write("Going to pass: "),
 	write(StatesH_Hand),
@@ -289,9 +262,9 @@ mix([X|List1],List2,[X|List3]) :-
 
 % Used in alphabeta:
 max( X, Y, Z):-
-write("Going to maximize, X:"),
+write("Going to maximize, repeated:"),
 write(X),
-write(" , Y:"),
+write(" , doubleTales:"),
 write(Y),
 write(" "),
 	X >=Y,
@@ -305,7 +278,6 @@ min( X, Y, Z):-
 	!.
 min(_, Y, Y).
 
-
 /*-------------------- Heuristica --------------------*/
 
 %Sum of the score of three different heuristic methods
@@ -318,16 +290,27 @@ heuristic(Hand,HandOp,Res):-
 
 
 % if we stay with double tales if we lose we would have a higher score,
-% so we assign -1 score if we have 2 or more double tales 
-%1 score if we have 1 or none double tale
+% so we assign -3 score if we have 2 or more double tales 
+%3 score if we have 1 or none double tale
 % %i,o
 relationDT(Hand,Res):-
     doubleTales(Hand,Count),
     Count>=2,
-    Res is -1;
-    Res is 1.
+    Res is 2;
+    Res is -2.
 
+%Counts number of double tales on the hand
+%%i,o
+doubleTales([X|Tail], Count):-
+    isDT(X,Res),
+    doubleTales(Tail,C1),
+    Count is C1+Res.
+doubleTales([],0):-!.
 
+%Checks if the two number on the piece are the same
+%%i,o
+isDT([X|Tail],Res):-
+    second(Tail,Num),
     X=:=Num,
     Res is 1;
     Res is 0.
@@ -376,7 +359,7 @@ numRepeated2(Bigger,Bigger,[]):-!.
 
 
 
-%Count the repetitions that there are for each nuber, the double tales count as one
+%Count the repetitions that there are for each number, the double tales count as one
 % i,i,o
 count2(Hand,Num, Freq):-
     Num=:=7, Freq = [];
