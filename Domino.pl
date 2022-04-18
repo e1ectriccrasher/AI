@@ -1,16 +1,22 @@
-/*-------------------Instruction--------------------*/
+/*-------------------- Instructions --------------------*/
 % You can start the game using:
 % startGame.
 
 
-:- use_module(library(clpfd)).
+% Still implementing:
+
+% Need to finish! This method returns the possible pieces in the enemy hand
+% This method is suposed to get a list containing the possible domino tiles that can be played by us.
+% write("What is the enemy doing (d: draw| p: playing):"),
+
+/*-------------------- Board & Game Engine --------------------*/
 
 % Main predicate:
 startGame():-
     % Create the board State: [Layout, Possible Pieces, userHand]
     initState(State),
     % Add 7 new pieces to the hand
-    draw(State,0,3, NewState), %Debo cambiar a 7 piezas
+    draw(State,0,1, NewState),
     % Check whos first and start game.
     chooseTurn(NewState).
 
@@ -19,26 +25,30 @@ initState([[-1],[[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 1],
 
 % Print the Game State
 printGameDetails([Layout, Possible, Hand]):-
-    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n',[Layout, Possible, Hand]).
+    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n', [Layout, Possible, Hand]).
 
 % draw(0, N) := Take N pieces querying the user.
 draw(State, Current, Current, State).
 draw(State, Current, EndCondition, NewState):-
     [Layout, Possible, Hand] = State,
     !,
+    Current=\=1,
     write("Insert piece value [X, Y]: "), %Pieces must be inserted in the order found in Possible Pieces, and with [].
     nl,
     read(X),
     [Side1, Side2] = X,
-    Side1 < 7,
-    Side1 >= 0,
-    Side2 < 7,
-    Side2 >= 0,
     append([X], Hand, NewHand),			% Add the drawn piece to hand
     delete(Possible, [Side1, Side2], NewPossible), % Remove drawn piece from possible pieces
     delete(NewPossible, [Side2, Side1], NewPossible2),
     Next is Current + 1,
     draw([Layout, NewPossible2, NewHand] , Next, EndCondition, NewState).
+
+
+
+funcion(State,NewState):-
+
+    draw(State,0,1,NewState),!;
+    nl.
 
 % Determine what player is going to play first
 chooseTurn(State):-
@@ -54,7 +64,7 @@ chooseTurn(State):-
 myTurn(State):-
     printGameDetails(State), nl,
     write("-------------My Turn--------------"), nl,
-    selectMyMove(State). %We add the move to the board/Layout
+    selectMyMove(State).
 
 enemyTurn(State):-
     printGameDetails(State) ,nl,
@@ -63,11 +73,34 @@ enemyTurn(State):-
 
 /*-------------------- My moves --------------------*/
 
+
+
 % Check if we can play and make an optimal move.
+selectMyMove(State):-
+    %[_, _, Hand] = State,
+    % if hand is empty, got to performMyCommand(bla, draw, bla),
 
-	Move = [6,6], %falta agregar el paso de inicio agregar toda la funcionalidad.
-    	performMyCommand(State,Move).
+    % Check if we can play something, if not, performMyCommand(bla, pass, bla),
 
+    % Get a smart sublist of the hand, checking what can be played,
+
+    % Run alfabeta with that info, getting the best tile we can play
+
+    %genStates(Hand, InterestingMoves),
+    % alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
+    % Last but not least, perform that command
+    
+    write(' vas a comer?(y/n) '),
+    read(X_1),
+    X_1=y,
+    funcion(State,NewState),selectMyMove(NewState);
+    
+    % ======================================== esto es para poner la ficha
+    write("pon la fiha "),
+	read(X_44),
+    Move = X_44, %dummy move
+    performMyCommand(State, Move).
+    %printGameDetails(State).
 
 % performMyCommand(State, Side, Move)
 performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
