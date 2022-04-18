@@ -20,14 +20,21 @@ startGame():-
     % Check whos first and start game.
     chooseTurn(NewState).
 
-% Contains Empty Layout, All Domino Tiles(28) & Empty hand.
+% es una lista de todas las fichas posibles 
 initState([[-1],[[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 1], [1, 2],[1, 3], [1, 4], [1, 5], [1, 6], [2, 2],[2, 3], [2, 4], [2, 5], [2, 6], [3, 3],[3, 4], [3, 5], [3, 6], [4, 4], [4, 5], [4, 6], [5, 5], [5, 6], [6, 6]],[]]).
 
 % Print the Game State
+% imprime el estado actual del juego
+% Layout -> es la representacion del juego 
+% Hand -> son las fichas que tenemos en nuestra mano actualmente
 printGameDetails([Layout, Possible, Hand]):-
     format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n', [Layout, Possible, Hand]).
 
-% draw(0, N) := Take N pieces querying the user.
+% Se usa para añdir fichas en el juego inicial y para añadir fichas cuado se requiere comer
+% State -> es el estado inicial de la partda en ese momento
+% Current -> es el contador de las fichas en ceros
+% Current -> es el contador final de las fichas, se usa para saber cuantas fichas se van a insertar
+% NewState -> es el estado final del juego en ese momento, puede cambiar el número de fichas y sus valores, es el parámetro de salida de la función
 draw(State, Current, Current, State).
 draw(State, Current, EndCondition, NewState):-
     [Layout, Possible, Hand] = State,
@@ -44,13 +51,16 @@ draw(State, Current, EndCondition, NewState):-
     draw([Layout, NewPossible2, NewHand] , Next, EndCondition, NewState).
 
 
-
+% comer fichas de domino cuando no tenemos
+% State -> es el estado inicial del juego en ese momento de la partida
+% NewState -> es el estado final de la partida después de cambios en el juego(cambios en el numero y valor de las fichas de domino)
 funcion(State,NewState):-
 
     draw(State,0,1,NewState),!;
     nl.
 
 % Determine what player is going to play first
+% State-> es el estado actual de la partida
 chooseTurn(State):-
     write("Am I going first? (y/n):"),
     nl,
@@ -61,11 +71,14 @@ chooseTurn(State):-
     enemyTurn(State).
 
 /*-------------------- Turns --------------------*/
+% indica el turno del usuario
+% State -> estado actual de la partida
 myTurn(State):-
     printGameDetails(State), nl,
     write("-------------My Turn--------------"), nl,
     selectMyMove(State).
-
+% indica el turno del contrincante
+% State -> estado actual de la partida
 enemyTurn(State):-
     printGameDetails(State) ,nl,
     write("--------------Enemy's Turn--------------"), nl,
@@ -76,6 +89,7 @@ enemyTurn(State):-
 
 
 % Check if we can play and make an optimal move.
+% selecciona el movimiento que se va a ejecutar(Comer o Jugar)
 selectMyMove(State):-
     %[_, _, Hand] = State,
     % if hand is empty, got to performMyCommand(bla, draw, bla),
@@ -96,11 +110,13 @@ selectMyMove(State):-
     funcion(State,NewState),selectMyMove(NewState);
     
     % ======================================== esto es para poner la ficha
+    printGameDetails(State),
     write("pon la fiha "),
 	read(X_44),
     Move = X_44, %dummy move
+    printGameDetails(State),
     performMyCommand(State, Move).
-    %printGameDetails(State).
+    
 
 % performMyCommand(State, Side, Move)
 performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
