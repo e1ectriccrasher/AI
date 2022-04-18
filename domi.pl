@@ -360,7 +360,7 @@ heuristicAux2([_|Tail],[0|Tail2]):-
 	heuristicAux2(Tail,Tail2).
 
 
-heuristic(NewAux,,Res):-
+heuristic(NewAux,Res):-
 	heuristicAux2(NewAux,NewAux2),
 	repeated(NewAux,NewAux2),
 	relationDT(NewAux,NewAux2),
