@@ -1,6 +1,7 @@
-/*-------------------Instruction--------------------*/
+/*-------------------- Instructions --------------------*/
 % You can start the game using:
 % startGame.
+
 
 /*-------------------- Board & Game Engine --------------------*/
 
@@ -18,13 +19,14 @@ initState([[-1],[[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 1],
 
 % Print the Game State
 printGameDetails([Layout, Possible, Hand]):-
-    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n',[Layout, Possible, Hand]).
+    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n', [Layout, Possible, Hand]).
 
 % draw(0, N) := Take N pieces querying the user.
 draw(State, Current, Current, State).
 draw(State, Current, EndCondition, NewState):-
     [Layout, Possible, Hand] = State,
     !,
+    Current=\=1,
     write("Insert piece value [X, Y]: "), %Pieces must be inserted in the order found in Possible Pieces, and with [].
     nl,
     read(X),
@@ -34,6 +36,13 @@ draw(State, Current, EndCondition, NewState):-
     delete(NewPossible, [Side2, Side1], NewPossible2),
     Next is Current + 1,
     draw([Layout, NewPossible2, NewHand] , Next, EndCondition, NewState).
+
+
+
+funcion(State,NewState):-
+
+    draw(State,0,1,NewState),!;
+    nl.
 
 % Determine what player is going to play first
 chooseTurn(State):-
@@ -49,7 +58,7 @@ chooseTurn(State):-
 myTurn(State):-
     printGameDetails(State), nl,
     write("-------------My Turn--------------"), nl,
-    selectMyMove(State). %We add the move to the board/Layout
+    selectMyMove(State).
 
 enemyTurn(State):-
     printGameDetails(State) ,nl,
@@ -58,19 +67,7 @@ enemyTurn(State):-
 
 /*-------------------- My moves --------------------*/
 
-% Check if we can play and make an optimal move.
-selectMyMove(State):-
-	heuristicAnalysis(State,Res),
-	chooseMove(State,Res,Move),
-    	performMyCommand(State,Move).
 
-heuristicAnalysis(Hand,Res):-
-	repeated(Hand,ResRep),
-	relationDT(Hand,ResDT),
-	max(ResRep,ResDT,Res).
-
-chooseMove(State,Res,Move):-
-	
 
 % performMyCommand(State, Side, Move)
 performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
