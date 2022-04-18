@@ -1,4 +1,4 @@
-/*-------------------Instruction--------------------*/
+/*-------------------- Instructions --------------------*/
 % You can start the game using:
 % startGame.
 
@@ -10,7 +10,6 @@
 % write("What is the enemy doing (d: draw| p: playing):"),
 
 /*-------------------- Board & Game Engine --------------------*/
-:- use_module(library(clpfd)).
 
 % Main predicate:
 startGame():-
@@ -18,7 +17,6 @@ startGame():-
     initState(State),
     % Add 7 new pieces to the hand
     draw(State,0,1, NewState),
-    draw(State,0,3, NewState), %Debo cambiar a 7 piezas
     % Check whos first and start game.
     chooseTurn(NewState).
 
@@ -27,7 +25,7 @@ initState([[-1],[[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [1, 1],
 
 % Print the Game State
 printGameDetails([Layout, Possible, Hand]):-
-    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n',[Layout, Possible, Hand]).
+    format('Layout: ~w~nPossible Pieces: ~w~nMy Hand: ~w~n', [Layout, Possible, Hand]).
 
 % draw(0, N) := Take N pieces querying the user.
 draw(State, Current, Current, State).
@@ -39,10 +37,6 @@ draw(State, Current, EndCondition, NewState):-
     nl,
     read(X),
     [Side1, Side2] = X,
-    Side1 < 7,
-    Side1 >= 0,
-    Side2 < 7,
-    Side2 >= 0,
     append([X], Hand, NewHand),			% Add the drawn piece to hand
     delete(Possible, [Side1, Side2], NewPossible), % Remove drawn piece from possible pieces
     delete(NewPossible, [Side2, Side1], NewPossible2),
@@ -70,7 +64,7 @@ chooseTurn(State):-
 myTurn(State):-
     printGameDetails(State), nl,
     write("-------------My Turn--------------"), nl,
-    selectMyMove(State). %We add the move to the board/Layout
+    selectMyMove(State).
 
 enemyTurn(State):-
     printGameDetails(State) ,nl,
@@ -90,8 +84,7 @@ selectMyMove(State):-
 
     % Get a smart sublist of the hand, checking what can be played,
 
-	Move = [6,6], %falta agregar el paso de inicio agregar toda la funcionalidad.
-    	performMyCommand(State,Move).
+    % Run alfabeta with that info, getting the best tile we can play
 
     %genStates(Hand, InterestingMoves),
     % alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
