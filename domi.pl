@@ -3,6 +3,12 @@
 % startGame.
 
 
+% Still implementing:
+
+% Need to finish! This method returns the possible pieces in the enemy hand
+% This method is suposed to get a list containing the possible domino tiles that can be played by us.
+% write("What is the enemy doing (d: draw| p: playing):"),
+
 /*-------------------- Board & Game Engine --------------------*/
 
 % Main predicate:
@@ -10,7 +16,7 @@ startGame():-
     % Create the board State: [Layout, Possible Pieces, userHand]
     initState(State),
     % Add 7 new pieces to the hand
-    draw(State,0,7, NewState), %Ask to enter the 7 titles
+    draw(State,0,1, NewState),
     % Check whos first and start game.
     chooseTurn(NewState).
 
@@ -69,6 +75,22 @@ enemyTurn(State):-
 
 
 
+% Check if we can play and make an optimal move.
+selectMyMove(State):-
+  
+    
+    write(' vas a comer?(y/n) '),
+    read(X_1),
+    X_1=y,
+    funcion(State,NewState),selectMyMove(NewState);
+    
+    % ======================================== esto es para poner la ficha
+    write("pon la fiha "),
+	read(X_44),
+    Move = X_44, %dummy move
+    performMyCommand(State, Move).
+    %printGameDetails(State).
+
 % performMyCommand(State, Side, Move)
 performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
     % Remove the piece moved from my hand
@@ -78,7 +100,7 @@ performMyCommand([Layout, Possible, Hand], [Side1, Side2]):-
     insertDomino( [Side1, Side2], Layout, NewLayout),
     format("I placed ~w.~n", [[Side1,Side2]] ),
     % Start enemyTurn with the new State
-    enemyTurn([NewLayout, Possible, NewHand2]).
+    enemyTurn([NewLayout, Possible, NewHand2]). %Falla
 
 /*-------------------- Enemy Moves--------------------*/
 % Manage the enemy turn
@@ -158,16 +180,46 @@ deleteListFromList(List1, [L2H |L2T], Result):-
 	delete(SubResult, L2H, Result). 
 
 /*-------------------- Alphabeta --------------------*/
+test:-
+	genStates([1,2,3], PossibleHands),
+	write("PossibleHands are: "),
+	write(PossibleHands),
+	nl,
+	alphabeta(4, -3000, 3000, PossibleHands, [4,5] , BestMove, 0),
+	nl,nl,nl,
+	write("Result is: "),
+	write( BestMove),
+	write(".").
+
+% Depth is 0
+alphabeta(-1, _, _, -, _ , BestMove,_):-
+	% This should call the heuristic function
+	write("Calling heuristic clause: "),nl,nl,
+	heuristic(BestMove).
 
 
+%There is no more states to explore.
+% X is the last piece the player can place.
+alphabeta( _, _, _, [ [_,[]] ], [], BestMove,_):-
+	write("Terminated"),
+	nl,nl,
+	heuristic(BestMove).
+
+%There is no more states to explore at the same level.
+% Need to remove -3000
+alphabeta( _, _, _, [], _, BestMove,_):-
+	BestMove is -543231,
+	write("Reached end of line").
 
 % Main alphabeta method (for the user)
 alphabeta( Depth, Alpha, Beta,[ [StatesH_Piece, StatesH_Hand] | StatesT], Storage, BestMove,0):-
 	write("Depth "),
 	write(Depth),
 	write("| "),
+        nl,
 	write("Played: " ),
 	write( StatesH_Piece),
+        nl,
 	write(", Starting alphabeta. "),
 	write("Going to pass: "),
 	write(StatesH_Hand),
@@ -259,9 +311,9 @@ mix([X|List1],List2,[X|List3]) :-
 
 % Used in alphabeta:
 max( X, Y, Z):-
-write("Going to maximize, repeated:"),
+write("Going to maximize, X:"),
 write(X),
-write(" , doubleTales:"),
+write(" , Y:"),
 write(Y),
 write(" "),
 	X >=Y,
@@ -275,34 +327,68 @@ min( X, Y, Z):-
 	!.
 min(_, Y, Y).
 
+
 /*-------------------- Heuristica --------------------*/
 
 %Sum of the score of three different heuristic methods
 %i,i,o
-heuristic(Hand,HandOp,Res):-
-    repeated(Hand,ResRep),
-    relationDT(Hand,ResDT),
-    relationOp(HandOp,Hand,ResOp),
-    Res is ResRep+ResOp+ResDT.
+
+%Auxiliar list
+heuristicAux([X|Tail],Layout,NewAux):-
+	Aux is Layout,
+	getFirstElement(Layout, [First1, _]),
+	getLastElement(Layout, [_, Last2]),
+	[Side1,Side2]=X,
+		(	% Check at the beginning of List
+		Side1 == First1,
+		pushToEnd([Side2, Side1],Aux, NewAux);
+		Side2 == First1,
+		pushToEnd([Side1, Side2], Aux,  NewAux);
+		% Check at the end of the List
+		Side1 == Last2,
+		pushToEnd([Side1, Side2], Aux, NewAux);
+		Side2 == Last2,
+		pushToEnd([Side2, Side1], Aux, NewAux)
+	),
+	heuristicAux(Tail,Layout,NewAux).
+
+
+heuristicAux2([], []):-
+	!.
+
+heuristicAux2([_|Tail],[0|Tail2]):-
+	heuristicAux2(Tail,Tail2).
+
+
+heuristic(NewAux,,Res):-
+	heuristicAux2(NewAux,NewAux2),
+	repeated(NewAux,NewAux2),
+	relationDT(NewAux,NewAux2),
+	.
+
+
+
+
+	
 
 
 % if we stay with double tales if we lose we would have a higher score,
-% so we assign -3 score if we have 2 or more double tales 
-%3 score if we have 1 or none double tale
+% so we assign -1 score if we have 2 or more double tales 
+%1 score if we have 1 or none double tale
 % %i,o
 relationDT(Hand,Res):-
     doubleTales(Hand,Count),
     Count>=2,
-    Res is 2;
-    Res is -2.
-
+    Res is -1;
+    Res is 1.
 %Counts number of double tales on the hand
 %%i,o
-doubleTales([X|Tail], Count):-
+doubleTales([X|Tail],[Y|Tail2]):-
     isDT(X,Res),
-    doubleTales(Tail,C1),
-    Count is C1+Res.
-doubleTales([],0):-!.
+    Y is 0+Res,
+    doubleTales(Tail,Tail2).
+
+doubleTales([],[]):-!.
 
 %Checks if the two number on the piece are the same
 %%i,o
@@ -314,12 +400,6 @@ isDT([X|Tail],Res):-
 second([X|_],Num):-
     Num is X.
 
-% If the opponent has more pieces we have a positive score
-%i,i,o
-relationOp(HandOp,Hand,Res):-
-    size(HandOp,CountO),
-    size(Hand,CountP),
-    Res is CountO-CountP.
 
 %Relation between the number of tiles at our hand against the greater number of repeats number.
 %%i,i,o
