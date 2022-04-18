@@ -1,23 +1,22 @@
 /*-------------------- Instructions --------------------*/
 % You can start the game using:
 % startGame.
-%
-%
-%
-%
-% Falta agregar el comer ficha 
-%Hay  varios SINGLETON VARIABLES que no se como quitar
-%Lo ultimo poner en ingles
-%printGameDetails falta
-%
-/*-------------------- Board & Game Function --------------------*/
+
+
+% Still implementing:
+
+% Need to finish! This method returns the possible pieces in the enemy hand
+% This method is suposed to get a list containing the possible domino tiles that can be played by us.
+% write("What is the enemy doing (d: draw| p: playing):"),
+
+/*-------------------- Board & Game Engine --------------------*/
 
 % Main predicate:
 startGame():-
     % Create the board State: [Layout, Possible Pieces, userHand]
     initState(State),
     % Add 7 new pieces to the hand
-    draw(State,0,7, NewState),
+    draw(State,0,1, NewState),
     % Check whos first and start game.
     chooseTurn(NewState).
 
@@ -33,6 +32,7 @@ draw(State, Current, Current, State).
 draw(State, Current, EndCondition, NewState):-
     [Layout, Possible, Hand] = State,
     !,
+    Current=\=1,
     write("Insert piece value [X, Y]: "), %Pieces must be inserted in the order found in Possible Pieces, and with [].
     nl,
     read(X),
@@ -42,6 +42,13 @@ draw(State, Current, EndCondition, NewState):-
     delete(NewPossible, [Side2, Side1], NewPossible2),
     Next is Current + 1,
     draw([Layout, NewPossible2, NewHand] , Next, EndCondition, NewState).
+
+
+
+funcion(State,NewState):-
+
+    draw(State,0,1,NewState),!;
+    nl.
 
 % Determine what player is going to play first
 chooseTurn(State):-
@@ -66,8 +73,10 @@ enemyTurn(State):-
 
 /*-------------------- My moves --------------------*/
 
+
+
 % Check if we can play and make an optimal move.
-selectMyMove( State ):-
+selectMyMove(State):-
     %[_, _, Hand] = State,
     % if hand is empty, got to performMyCommand(bla, draw, bla),
 
@@ -80,6 +89,16 @@ selectMyMove( State ):-
     %genStates(Hand, InterestingMoves),
     % alphabeta(4, -3000, 3000, InterestingMoves, Possible , BestMove, 1);
     % Last but not least, perform that command
+    
+    write(' vas a comer?(y/n) '),
+    read(X_1),
+    X_1=y,
+    funcion(State,NewState),selectMyMove(NewState);
+    
+    % ======================================== esto es para poner la ficha
+    write("pon la fiha "),
+	read(X_44),
+    Move = X_44, %dummy move
     performMyCommand(State, Move).
     %printGameDetails(State).
 
