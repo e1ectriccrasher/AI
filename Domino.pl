@@ -12,16 +12,16 @@
 
 % Main predicate:
 startGame:- 
-	nb_setval(fichasOp, [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[2,2],[2,3],[2,4],[2,5],[2,6],[3,3],[3,4],[3,5],[3,6],[4,4],[4,5],[4,6],[5,5],[5,6],[6,6]]),
-	nb_setval(numFichas, 7),
-	nb_setval(numFichasOp, 7),
-	nb_setval(tablero, []),
+	nb_setval(handOp, [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[1,1],[1,2],[1,3],[1,4],[1,5],[1,6],[2,2],[2,3],[2,4],[2,5],[2,6],[3,3],[3,4],[3,5],[3,6],[4,4],[4,5],[4,6],[5,5],[5,6],[6,6]]),
+	nb_setval(numHand, 7),
+	nb_setval(numHandOp, 7),
+	nb_setval(layout, []),
 	write("Enter your tiles (Format [[A,B],[C,D]...]: "), nl,
 	read(A), nl,
-	nb_setval(fichas, A),
-	nb_getval(fichasOp, Op),
+	nb_setval(hand, A),
+	nb_getval(handOp, Op),
 	deleteList(A, Op, NOp),
-	nb_setval(fichasOp, NOp),
+	nb_setval(handOp, NOp),
 	write("You start the game? (y/n) "), nl,
 	read(Prim),
 	firstStep(Prim, T),
@@ -32,29 +32,29 @@ startGame:-
 % case n: Opponent throw first tile
 %  Put on the layout
 %  Changes list from opponent(handOp), possible pieces on the hand of opponent
-% decrease (numFichasOp)
+% decrease (numHandOp)
 firstStep(n, T):-
 	write("Enter tile from opponent: "), nl,
 	read(F),
-	nb_setval(tablero, [F,F]),
-	nb_setval(numFichasOp, 6),
-	nb_getval(fichasOp, FichasOp),
-	deleteTile(F, FichasOp, NuevasFichas),
-	nb_setval(fichasOp, NuevasFichas),
+	nb_setval(layout, [F,F]),
+	nb_setval(numHandOp, 6),
+	nb_getval(handOp, HandOp),
+	deleteTile(F, HandOp, NewHand),
+	nb_setval(handOp, NewHand),
 	T is 1.
 
 % case y: we put the first tile
 % Put on the layout
-% changes tile on hand(fichas)
-% decrease(numFichas)
+% changes tile on hand(hand)
+% decrease(numHand)
 firstStep(y, T):-
 	write("Enter first tile: "), nl,
 	read(F),
-	nb_setval(tablero, [F,F]),
-	nb_setval(numFichas, 6),
-	nb_getval(fichas, Fichas),
-	deleteTile(F, Fichas, NuevasFichas),
-	nb_setval(fichas, NuevasFichas),
+	nb_setval(layout, [F,F]),
+	nb_setval(numHand, 6),
+	nb_getval(hand, Hand),
+	deleteTile(F, Hand, NewHand),
+	nb_setval(hand, NewHand),
 	T is 0.
 
 % play(i): method to make all the moves ours/opponent
@@ -63,12 +63,12 @@ firstStep(y, T):-
 % Print layout
 % Ask if the opponent took tile
 % Ask if opponent throws on head or tail
-% Llama al predicado opponentTurn(i, i)
-% Llama al predicado play(1) para cambiar de turno
+% calls opponentTurn(i, i)
+% calls play(1) to change turn
 play(0):-
-	nb_getval(numFichas, Num),
-	((Num < 1, write("YOU WON!!!!!!!! :)"), nl, !);
-	(nb_getval(tablero, Tab),
+	nb_getval(numHand, Num),
+	((Num < 1, write("----------YOU WON!!!!!!!!------------"), nl, !);
+	(nb_getval(layout, Tab),
 	length(Tab, Len),
 	write("LAYOUT: "), nl,
 	write("----"), printLine(Len), write("----"), nl,
@@ -76,36 +76,48 @@ play(0):-
 	write("----"), printLine(Len), write("----"), nl,
 	nl, write("How many does the opponent take?"), nl,
 	read(N),
-	write("-1: Opponent thown on the head"),nl,
+	write("Enter number: "),nl,nl,
+	write("-1: throws on the head"),nl,
 	write(" 0: if it did not throw"),nl,
-	write(" 1: throws on tail"), nl,
+	write(" 1: throws on tail"), nl,nl,
 	read(U),
 	opponentTurn(N, U), nl,
 	play(1))).
 
-
+%Case 1:
+%Check if the opponent already won
+%Print layout
+%print tiles from player
+%calls makemove()
+%calls play(0) to change turn
+%
 play(1):-
-	nb_getval(numFichasOp, Num),
+	nb_getval(numHandOp, Num),
 	write("The opponent has "), write(Num), write(" tiles"), nl,
-	((Num < 1, write("YOU LOST!!!!!!!! :("), nl, !);
-	(nb_getval(tablero, Tab),
+	((Num < 1, write("---------YOU LOST!!!!!!!!-------------"), nl, !);
+	(nb_getval(layout, Tab),
 	length(Tab, Len),
 	write("LAYOUT: "), nl,
 	write("--"), printLine(Len), write("--"), nl,
 	write("|"), write(Tab), write("|"), nl,
 	write("--"), printLine(Len), write("--"), nl,
-	nb_getval(fichas, Fichas),
-	nl, write("YOUR HAND: "), write(Fichas), nl,
+	nb_getval(hand, Hand),
+	nl, write("YOUR HAND: "), write(Hand), nl,
 	makeMove(), nl,
 	play(0))).
 
+%update value of numHandOp and update layout if the opponent throw a tile
+%We have three cases
+%Case 0: the opponent did not throw
+%Case 1: the opponent throws tile on tail
+%Case -1: the opponent throws tile on head
 
 opponentTurn(N, 0):-
 	checkTie(),
-	nb_getval(numFichasOp, M),
-	NuevoNum is N + M,
-	nb_setval(numFichasOp, NuevoNum),
-	nb_setval(empate, 1).
+	nb_getval(numHandOp, M),
+	NewNum is N + M,
+	nb_setval(numHandOp, NewNum),
+	nb_setval(tiee, 1).
 
 
 opponentTurn(N, V):-
@@ -113,115 +125,122 @@ opponentTurn(N, V):-
 	read(F),
 	changeTile(F, V, NF),
 	settle(V, NF),
-	nb_getval(fichasOp, Op),
+	nb_getval(handOp, Op),
 	deleteTile(NF, Op, NOp),
-	nb_setval(fichasOp, NOp),
-	nb_getval(numFichasOp, M),
-	NuevoNum is (N + M - 1),
-	nb_setval(empate, 0),
-	nb_setval(numFichasOp, NuevoNum).
+	nb_setval(handOp, NOp),
+	nb_getval(numHandOp, M),
+	NewNum is (N + M - 1),
+	nb_setval(tiee, 0),
+	nb_setval(numHandOp, NewNum).
 
 changeTile(F, 1, NF):-
 	head(F, HF), last(F, TF),
-	nb_getval(tablero, Tab),
+	nb_getval(layout, Tab),
 	last(Tab, Ult), last(Ult, TT),
 	((HF =:= TT, NF = F);
 		(NF = [TF, HF])).
 
 changeTile(F, -1, NF):-
 	head(F, HF), last(F, TF),
-	nb_getval(tablero, Tab),
+	nb_getval(layout, Tab),
 	head(Tab, Prim), head(Prim, HT),
 	((TF =:= HT, NF = F);
 		(NF =[TF, HF])).
 
-% settle(i, i): adjust la ficha la cabeza o cola del tablero 
+% settle(i, i): adjust the tile to match the layout 
 
-% Caso -1: adjust la ficha (F) en la cabeza del tablero
+% Case -1: adjust the tile (F) on the head of layout
 settle(-1, F):- 
-	nb_getval(tablero, Tab),
-	nb_setval(tablero, [F|Tab]).
+	nb_getval(layout, Tab),
+	nb_setval(layout, [F|Tab]).
 
-% Caso 1: adjust la ficha (F) en la cola del tablero
+% Case 1: adjust the tile (F) on the tail of layout
 settle(1, F):- 
-	nb_getval(tablero, Tab),
+	nb_getval(layout, Tab),
 	union(Tab,[F], NT),
-	nb_setval(tablero, NT).
+	nb_setval(layout, NT).
 
-% Caso 2: Busca dónde se puede settle la ficha (F) y llama a settle() según corresponda
+% Case 2: Search the option of position
 settle(2, F):-
-	nb_getval(tablero, [[HT|_]|B]),
-	head(F, HF), last(F, TF), % Head Ficha y Tail Ficha
-	last(B, UF), last(UF, TT), % ultima ficha y Tail de la ultima ficha
-	(
+	nb_getval(layout, [[HT|_]|B]),
+	head(F, HF), last(F, TF), 
+	last(B, UF), last(UF, TT),	(
 		(HF =:= HT, settle(-1,[TF,HF]));
 		(TF =:= HT, settle(-1, F));
 		(HF =:= TT, settle(1, F));
 		(TF =:= TT, settle(1, [TF,HF])),!).
 
 
-
+%MakeMove: main predicate to make the riht move on the board
+%calls find to look for the possible moves
+%calls takeNewTile if we do not have any valid move
+%calls adjust if the list has only one option
+%calls alphabeta if the list>1
+%
 makeMove:-
-	nb_getval(fichas, Fichas),
-	nb_getval(tablero, [[A1|_]|B]),
-	nb_getval(numFichas, NumFichas),
-	NuevoNum is NumFichas - 1,
-	find(Fichas, A1, [], D), % D es la lista de las fichas que se pueden settle en la cabeza
+	nb_getval(hand, Hand),
+	nb_getval(layout, [[A1|_]|B]),
+	nb_getval(numHand, NumFichas),
+	NewNum is NumFichas - 1,
+	find(Hand, A1, [], D),
 	last(B, L),
 	last(L, L1),
-	find(Fichas, L1, D, PF), % PF es posibles fichas
+	find(Hand, L1, D, PF), 
 	((PF == [], 
-		takeNewTile(Fichas, NumFichas));
+		takeNewTile(Hand, NumFichas));
 	(length(PF, 1),
 		write("Possible moves: "), write(PF), nl,
 	 	head(PF, F), 
-		deleteTile(F, Fichas, NuevasFichas), 
-	 	nb_setval(fichas, NuevasFichas), 
+		deleteTile(F, Hand, NewHand), 
+	 	nb_setval(hand, NewHand), 
 	 	settle(2, F), 
-	 	nb_setval(empate, 0),
-	 	nb_setval(numFichas, NuevoNum),
+	 	nb_setval(tiee, 0),
+	 	nb_setval(numHand, NewNum),
 	 	nl, write("Best Move: "), write(F), nl);
 	(write("Possibles moves: "), write(PF), nl,
-		nb_getval(tablero, Tablero),
-		% nb_getval(numFichas, Num),
-		% nb_getval(numFichasOp, NumOp),
-		% Profundidad is Num + NumOp,
-		nb_getval(fichasOp, FichasOp),
-		alphabeta(Tablero, 3, FichasOp, Fichas, Fichas, 1, -10000,  10000, MejorTiro, Valor), 
-		write("Valor de la rama: "), write(Valor), nl,
-		nl, write("Best move: "), write(MejorTiro), nl,
-		deleteTile(MejorTiro, Fichas, NuevasFichas), nb_setval(fichas, NuevasFichas),
-		nb_setval(empate, 0),
-		nb_setval(numFichas, NuevoNum),
-		settle(2, MejorTiro),!
+		nb_getval(layout, Layout),
+
+		nb_getval(handOp, HandOp),
+		alphabeta(Layout, 3, HandOp, Hand, Hand, 1, -10000,  10000, BestMove, Value), 
+		write("Value de la rama: "), write(Value), nl,
+		nl, write("Best move: "), write(BestMove), nl,
+		deleteTile(BestMove, Hand, NewHand), nb_setval(hand, NewHand),
+		nb_setval(tiee, 0),
+		nb_setval(numHand, NewNum),
+		settle(2, BestMove),!
 		)).
 
-
-
+%TakeNewTile: method that put the new tile on the hand
+%A: list of tiles
+%L: number of tiles
+%Ask if they are tile to take
+%Put the new tile on the hand
+%Delete the tile from handop
+%calls makeMove
 takeNewTile(A, L):-
-	% write("Escribe 1 si hay fichas para takeNewTile o 0 si ya se acabaron las fichas"), nl,
-	% read(Valor),
-	nb_getval(numFichasOp, NumFichasOp),
-	nb_getval(fichasOp, FichasOp),
-	length(FichasOp, Len),
-	Valor is Len - NumFichasOp,
-	((Valor =:= 0, write("PASS"), nl,
-	nb_getval(empate, Empate),
-	checkTie(Empate));
+	% write("Escribe 1 si hay hand para takeNewTile o 0 si ya se acabaron las hand"), nl,
+	% read(Value),
+	nb_getval(numHandOp, NumHandOp),
+	nb_getval(handOp, HandOp),
+	length(HandOp, Len),
+	Value is Len - NumHandOp,
+	((Value =:= 0, write("PASS"), nl,
+	nb_getval(tiee, Tiee),
+	checkTie(Tiee));
 	(write("Put new tile: "), nl,
 	read(F),
-	nb_setval(fichas, [F|A]),
-	nb_getval(fichasOp, Op),
+	nb_setval(hand, [F|A]),
+	nb_getval(handOp, Op),
 	deleteTile(F, Op, NOp),
-	nb_setval(fichasOp, NOp),
+	nb_setval(handOp, NOp),
 	LN is (L + 1),
-	nb_setval(numFichas, LN),
+	nb_setval(numHand, LN),
 	nl, write("You have "), write(LN), write(" tiles"), nl,
 	makeMove())).
 
-% Comprueba si el jugador anterior pasó y si falla si sí pasó
+%checks if the oppponent did not throw and the game is blocked
 checkTie(0):-
-	nb_setval(empate, 1),
+	nb_setval(tiee, 1),
 	play(0).
 
 checkTie(1):-
@@ -229,97 +248,120 @@ checkTie(1):-
 
 % ----------------------------------------------------- MINIMAX Y FUNCIÓN HEURÍSTICA ------------------------------------------------------------------------------------
 
+%putTitle
+%update the layout 
+%delete the move from the hand
+%returns a newLayout
 
-putTile(Fichas, Tiro, Tablero, NuevasFichas, NuevoTablero):-
-	completeLayout(Tiro, Tablero, NuevoTablero),
-	deleteTile(Tiro, Fichas, NuevasFichas).
+putTile(Hand, Hit, Layout, NewHand, NewLayout):-
+	completeLayout(Hit, Layout, NewLayout),
+	deleteTile(Hit, Hand, NewHand).
 
-
-completeLayout(Tiro, Tablero, NuevoTablero):-
-	nb_setval(tab, Tablero),
+%Complete layout
+%take the head
+%take the tail
+%compare with the head and tail of the tile to play
+%
+completeLayout(Hit, Layout, NewLayout):-
+	nb_setval(tab, Layout),
 	nb_getval(tab, [[HT|_]|B]),
-	head(Tiro, HF), last(Tiro, TF),
+	head(Hit, HF), last(Hit, TF),
 	last(B, UF), last(UF, TT), 
-	((HF =:= HT, adjust(-1,[TF,HF], Tablero, NuevoTablero));
-	(TF =:= HT, adjust(-1, Tiro, Tablero, NuevoTablero));
-	(HF =:= TT, adjust(1, Tiro, Tablero, NuevoTablero));
-	(TF =:= TT, adjust(1, [TF,HF], Tablero, NuevoTablero)), !).
+	((HF =:= HT, adjust(-1,[TF,HF], Layout, NewLayout));
+	(TF =:= HT, adjust(-1, Hit, Layout, NewLayout));
+	(HF =:= TT, adjust(1, Hit, Layout, NewLayout));
+	(TF =:= TT, adjust(1, [TF,HF], Layout, NewLayout)), !).
+
+%adjust the tile to make sense on the layout
+adjust(-1, Hit, Layout, NewLayout):- 
+	union([Hit], Layout, NewLayout).
 
 
-adjust(-1, Tiro, Tablero, NuevoTablero):- 
-	union([Tiro], Tablero, NuevoTablero).
+adjust(1, Hit, Layout, NewLayout):- 
+	union(Layout, [Hit], NewLayout). 
 
+/*------------------------------------------------ALPHABETA------------------------*/
+ %ALPHABETA 
+ %the method that implements the algorithm of minmax with alphabeta to make the bestmove
+ %Case1: Hand is empty.
+alphabeta(_, _, HideTiles, [], _, _, _, _, _, Value):-
+	length(HideTiles, N1),
+	Value is N1, !.
 
-adjust(1, Tiro, Tablero, NuevoTablero):- 
-	union(Tablero, [Tiro], NuevoTablero). 
+%Case2: We cannot put a tile.
+%We have to pass or takeNewTile
+%
+alphabeta(MaxMin, _, HideTiles, MyTiles, [], _, _, _, _, Value):-
+	length(HideTiles, N1), length(MyTiles, N2),
+	Value is (N1 - N2) * (-MaxMin), !.
 
+%Case3:we reach the max depth 
+%
+alphabeta(_, 0, HideTiles, MyTiles, _, _, _, _, _, Value):-
+	length(HideTiles, N1), length(MyTiles, N2), 
+	Value is (N1 - N2), !.
 
-alphabeta(_, _, FichasOcultas, [], _, _, _, _, _, Valor):-
-	length(FichasOcultas, N1),
-	Valor is N1, !.
+%Case4:HandOp is empty 
+%
+alphabeta(_, _, [], MyTiles, _, _, _, _, _, Value):-
+	length(MyTiles, N2),
+	Value is -N2, !.
 
-
-alphabeta(MaxMin, _, FichasOcultas, MisFichas, [], _, _, _, _, Valor):-
-	length(FichasOcultas, N1), length(MisFichas, N2),
-	Valor is (N1 - N2) * (-MaxMin), !.
-
-
-alphabeta(_, 0, FichasOcultas, MisFichas, _, _, _, _, _, Valor):-
-	length(FichasOcultas, N1), length(MisFichas, N2), 
-	Valor is (N1 - N2), !.
-
-
-alphabeta(_, _, [], MisFichas, _, _, _, _, _, Valor):-
-	length(MisFichas, N2),
-	Valor is -N2, !.
-
-
-alphabeta(Tablero, Profundidad, FichasOcultas, MisFichas, Buscar, MaxMin, Alfa, Beta, Movimiento, Valor):-
-	Profundidad > 0,
-	nb_setval(tabProv, Tablero),
+%layout: is the board on the game
+%Depth: depth of search (arbitrary)
+%player: the player on the game. 1 for the user
+%alfa beta: given from user
+%Hand: all the tiles of the user
+%HandOp: hidden tiles from opponent
+%Search: tiles from player that we use for making the best choice
+%RETURN THE BESTMOVE
+alphabeta(Layout, Depth, HideTiles, MyTiles, Search, MaxMin, Alfa, Beta, Movement, Value):-
+	Depth > 0,
+	nb_setval(tabProv, Layout),
 	nb_getval(tabProv, [[A1|_]|B]),
-	find(Buscar, A1, [], D), 
+	find(Search, A1, [], D), 
 	last(B, L),
 	last(L, L1),
-	find(Buscar, L1, D, Posibilidades),
+	find(Search, L1, D, Possibility),
 	Alfa1 is -Beta,
 	Beta1 is -Alfa,	
-	NuevaP is Profundidad - 1,
-	move(MaxMin, Posibilidades, Tablero, FichasOcultas, MisFichas, Buscar, NuevaP, Alfa1, Beta1, _, (Movimiento, Valor)), !.
+	NuevaP is Depth - 1,
+	move(MaxMin, Possibility, Layout, HideTiles, MyTiles, Search, NuevaP, Alfa1, Beta1, _, (Movement, Value)), !.
 
 
-move(_, [], _, _, _, _, _, Alfa, _, Tiro, (Tiro, Alfa)).
 
-move(MaxMin, [Tiro | Restantes], Tablero, FichasOcultas, MisFichas, Buscar, Profundidad, Alfa, Beta, Record, MejorTiro):-
-	putTile(Buscar, Tiro, Tablero, NuevasFichas, NuevoTablero),
-	changePlayer(MaxMin, OtroMaxMin),
-	putNewTile(Tiro, Restantes, OtroMaxMin, NuevoTablero, Profundidad, FichasOcultas, MisFichas, NuevasFichas, Alfa, Beta, Record, MejorTiro, _), !.
+move(_, [], _, _, _, _, _, Alfa, _, Hit, (Hit, Alfa)).
 
-
-putNewTile(Tiro, Restantes, 1, Tablero, Profundidad, _, MisFichas, NuevasFichas, Alfa, Beta, Record, MejorTiro, Valor):-
-	alphabeta(Tablero, Profundidad, NuevasFichas, MisFichas, MisFichas, 1, Alfa, Beta, MejorTiro, Valor),
-	Valor1 is -Valor,
-	poda(1, Tiro, Valor1, Profundidad, Alfa, Beta, Restantes, Tablero, NuevasFichas, MisFichas, MisFichas, Record, MejorTiro).
+move(MaxMin, [Hit | Left], Layout, HideTiles, MyTiles, Search, Depth, Alfa, Beta, Record, BestMove):-
+	putTile(Search, Hit, Layout, NewHand, NewLayout),
+	changePlayer(MaxMin, MaxMin2),
+	putNewTile(Hit, Left, MaxMin2, NewLayout, Depth, HideTiles, MyTiles, NewHand, Alfa, Beta, Record, BestMove, _), !.
 
 
-putNewTile(Tiro, Restantes, -1, Tablero, Profundidad, FichasOcultas, _, NuevasFichas, Alfa, Beta, Record, MejorTiro, Valor):-
-	alphabeta(Tablero, Profundidad, FichasOcultas, NuevasFichas, FichasOcultas, -1, Alfa, Beta, MejorTiro, Valor),
-	Valor1 is -Valor,
-	poda(-1, Tiro, Valor1, Profundidad, Alfa, Beta, Restantes, Tablero, FichasOcultas, NuevasFichas, FichasOcultas, Record, MejorTiro).
+putNewTile(Hit, Left, 1, Layout, Depth, _, MyTiles, NewHand, Alfa, Beta, Record, BestMove, Value):-
+	alphabeta(Layout, Depth, NewHand, MyTiles, MyTiles, 1, Alfa, Beta, BestMove, Value),
+	Valor1 is -Value,
+	poda(1, Hit, Valor1, Depth, Alfa, Beta, Left, Layout, NewHand, MyTiles, MyTiles, Record, BestMove).
 
 
-poda(_, Tiro, Valor, _, _, Beta , _ , _, _, _, _, _, (Tiro, Valor)) :- 
-   Valor >= Beta, !.
+putNewTile(Hit, Left, -1, Layout, Depth, HideTiles, _, NewHand, Alfa, Beta, Record, BestMove, Value):-
+	alphabeta(Layout, Depth, HideTiles, NewHand, HideTiles, -1, Alfa, Beta, BestMove, Value),
+	Valor1 is -Value,
+	poda(-1, Hit, Valor1, Depth, Alfa, Beta, Left, Layout, HideTiles, NewHand, HideTiles, Record, BestMove).
 
 
-poda(MaxMin, Tiro, Valor, Profundidad, Alfa, Beta, Restantes, Tablero, FichasOcultas, MisFichas, Buscar, _, MejorTiro) :- 
-   Alfa < Valor, Valor < Beta, !, 
-   move(MaxMin, Restantes, Tablero, FichasOcultas, MisFichas, Buscar, Profundidad, Valor, Beta, Tiro, MejorTiro).
+poda(_, Hit, Value, _, _, Beta , _ , _, _, _, _, _, (Hit, Value)) :- 
+   Value >= Beta, !.
 
 
-poda(MaxMin, _, Valor, Profundidad, Alfa, Beta, Restantes, Tablero, FichasOcultas, MisFichas, Buscar, Record, MejorTiro) :- 
-   Valor =< Alfa, !, 
-   move(MaxMin, Restantes, Tablero, FichasOcultas, MisFichas, Buscar, Profundidad, Alfa, Beta, Record, MejorTiro).
+poda(MaxMin, Hit, Value, Depth, Alfa, Beta, Left, Layout, HideTiles, MyTiles, Search, _, BestMove) :- 
+   Alfa < Value, Value < Beta, !, 
+   move(MaxMin, Left, Layout, HideTiles, MyTiles, Search, Depth, Value, Beta, Hit, BestMove).
+
+
+poda(MaxMin, _, Value, Depth, Alfa, Beta, Left, Layout, HideTiles, MyTiles, Search, Record, BestMove) :- 
+   Value =< Alfa, !, 
+   move(MaxMin, Left, Layout, HideTiles, MyTiles, Search, Depth, Alfa, Beta, Record, BestMove).
 
 
 changePlayer(1, -1).
@@ -470,4 +512,3 @@ sum_list1([X|R], V):-
     sum_tile(X, SR),
     sum_list1(R, V1),
     V = [SR|V1].
-
