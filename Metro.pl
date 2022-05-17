@@ -1,12 +1,13 @@
-% Este programa encuentra la mejor manera para llegar de un punto inicial a uno final en el métro de
-% la ciudad de méxico.
+% Este programa encuentra la mejor manera para llegar de un punto inicial a uno final en el mÃ©tro de
+% la cdmx.
+% Se utiliza un modelo router para decidir la ruta.
 
 %____________________________________________________________________________________________________
 % Base de conocimientos:
 
 % lineas existentes
 linea(1). linea(2). linea(3). linea(4). linea(5). linea(6).
-linea(7). linea(8). linea(9). linea(a). linea(b). linea(12).
+linea(7). linea(8). linea(9). linea(10). linea(11). linea(12).
 
 % estaciones
 estacion(observatorio). estacion(tacubaya). estacion(juanacatlan). estacion(chapultepec). 
@@ -120,17 +121,17 @@ pertenece(lazarocardenas,9). pertenece(chabacano,9). pertenece(jamaica,9). perte
 pertenece(velodromo,9). pertenece(ciudaddeportiva,9). pertenece(puebla,9). pertenece(pantitlan,9). 
 
 % estaciones de la linea a
-pertenece(pantitlan,a). pertenece(agricolaoriental,a). pertenece(canaldesanjuan,a). pertenece(tepalcates,a). 
-pertenece(guelatao,a). pertenece(penionviejo,a). pertenece(acatitla,a). pertenece(santamarta,a). 
-pertenece(losreyes,a). pertenece(lapaz,a). 
+pertenece(pantitlan,10). pertenece(agricolaoriental,10). pertenece(canaldesanjuan,10). pertenece(tepalcates,10). 
+pertenece(guelatao,10). pertenece(penionviejo,10). pertenece(acatitla,10). pertenece(santamarta,10). 
+pertenece(losreyes,10). pertenece(lapaz,10). 
 
 % estaciones de la linea b
-pertenece(buenavista,b). pertenece(guerrero,b). pertenece(garibaldi,b). pertenece(lagunilla,b). 
-pertenece(tepito,b). pertenece(morelos,b). pertenece(sanlazaro,b). pertenece(rfloresmagon,b). 
-pertenece(rrubio,b). pertenece(oceania,b). pertenece(deportivooceania,b). pertenece(bosquedearagon,b). 
-pertenece(villadearagon,b). pertenece(nezahualcoyotl,b). pertenece(impulsora,b). pertenece(riodelosremedios,b). 
-pertenece(muzquiz,b). pertenece(tecnologico,b). pertenece(ecatepec,b). pertenece(olimpica,b). pertenece(plazaaragon,b). 
-pertenece(ciudadazteca,b).
+pertenece(buenavista,11). pertenece(guerrero,11). pertenece(garibaldi,11). pertenece(lagunilla,11). 
+pertenece(tepito,11). pertenece(morelos,11). pertenece(sanlazaro,11). pertenece(rfloresmagon,11). 
+pertenece(rrubio,11). pertenece(oceania,11). pertenece(deportivooceania,11). pertenece(bosquedearagon,11). 
+pertenece(villadearagon,11). pertenece(nezahualcoyotl,11). pertenece(impulsora,11). pertenece(riodelosremedios,11). 
+pertenece(muzquiz,11). pertenece(tecnologico,11). pertenece(ecatepec,11). pertenece(olimpica,11). pertenece(plazaaragon,11). 
+pertenece(ciudadazteca,11).
 
 % estaciones de la linea 12
 pertenece(mixcoac,12). pertenece(insurgentessur,12). pertenece(hospital20denoviembre,12). pertenece(zapata,12). 
@@ -140,8 +141,8 @@ pertenece(calle11,12). pertenece(perifericooriente,12). pertenece(tezonco,12). p
 pertenece(nopalera,12). pertenece(zapotitlan,12). pertenece(tlaltengo,12). pertenece(tlahuac,12).
 
 % adyacente:
-% describe las estaciones que están adyacentes sobre cada linea
-% nota: los predicados sí dependen del orden en que se escriben las estaciones
+% describe las estaciones que estÃ¡n adyacentes sobre cada linea
+% nota: los predicados sÃ­ dependen del orden en que se escriben las estaciones
 
 % linea 1
 adyacente(observatorio, tacubaya, 1). adyacente(tacubaya, juanacatlan,1). adyacente(juanacatlan, chapultepec,1).
@@ -159,7 +160,7 @@ adyacente(viaducto,xola,2). adyacente(xola,villadecortes,2). adyacente(villadeco
 adyacente(portales,ermita,2). adyacente(ermita,generalanaya,2). adyacente(generalanaya,tasquenia,2). 
 % linea 3
 adyacente(indiosverdes,deportivo18demarzo,3). adyacente(deportivo18demarzo,potrero,3). adyacente(potrero,laraza,3). adyacente(laraza,tlatelolco,3). 
-adyacente(tlatelolco,guerrero,3). adyacente(guerrero, hidalgo,3). adyacente(hidalgo,juarez,3). adyacente(juarez,balderas,3). adyacente(balderas,niniosheroes,1). 
+adyacente(tlatelolco,guerrero,3). adyacente(guerrero, hidalgo,3). adyacente(hidalgo,juarez,3). adyacente(juarez,balderas,3). adyacente(balderas,niniosheroes,3). 
 adyacente(niniosheroes,hospitalgeneral,3). adyacente(hospitalgeneral,centromedico,3). adyacente(centromedico,etiopia,3). adyacente(etiopia,eugenia,3). 
 adyacente(eugenia,divisiondelnorte,3). adyacente(divisiondelnorte,zapata,3). adyacente(zapata,coyoacan,3). adyacente(coyoacan,viveros,3). 
 adyacente(viveros,madequevedo,3). adyacente(madequevedo,copilco,3). adyacente(copilco,universidad,3). 
@@ -190,33 +191,53 @@ adyacente(uam1,constitucionde1917,8).
 adyacente(tacubaya,patriotismo,9). adyacente(patriotismo,chilpancingo,9). adyacente(chilpancingo,centromedico,9). adyacente(centromedico,lazarocardenas,9). 
 adyacente(lazarocardenas,chabacano,9). adyacente(chabacano,jamaica,9). adyacente(jamaica,mixiuhca,9). adyacente(mixiuhca,velodromo,9). 
 adyacente(velodromo,ciudaddeportiva,9). adyacente(ciudaddeportiva,puebla,9). adyacente(puebla,pantitlan,9). 
-% linea a
-adyacente(pantitlan,agricolaoriental,a). adyacente(agricolaoriental,canaldesanjuan,a). adyacente(canaldesanjuan,tepalcates,a). 
-adyacente(tepalcates,guelatao,a). adyacente(guelatao,penionviejo,a). adyacente(penionviejo,acatitla,a). adyacente(acatitla,santamarta,a). 
-adyacente(santamarta,losreyes,a). adyacente(losreyes,lapaz,a). 
-% linea b
-adyacente(ciudadazteca,plazaaragon,b). adyacente(plazaaragon,olimpica,b). adyacente(olimpica,ecatepec,b). adyacente(ecatepec,muzquiz,b). 
-adyacente(muzquiz,riodelosremedios,b). adyacente(riodelosremedios,impulsora,b). adyacente(impulsora,nezahualcoyotl,b). adyacente(nezahualcoyotl,villadearagon,b). 
-adyacente(villadearagon,bosquedearagon,b). adyacente(bosquedearagon,deportivooceania,b).  adyacente(deportivooceania,oceania,b). 
-adyacente(oceania,rrubio,b). adyacente(rrubio,rfloresmagon,b). adyacente(rfloresmagon,sanlazaro,b). adyacente(sanlazaro,morelos,b). 
-adyacente(morelos,tepito,b). adyacente(tepito,lagunilla,b). adyacente(lagunilla,garibaldi,b). adyacente(garibaldi,guerrero,b). adyacente(guerrero,buenavista,b). 
+% linea a (10)
+adyacente(pantitlan,10,agricolaoriental,10). adyacente(agricolaoriental,canaldesanjuan,10). adyacente(canaldesanjuan,tepalcates,10). 
+adyacente(tepalcates,guelatao,10). adyacente(guelatao,penionviejo,10). adyacente(penionviejo,10,acatitla,10). adyacente(acatitla,santamarta,10). 
+adyacente(santamarta,losreyes,10). adyacente(losreyes,lapaz,10). 
+% linea b (11)
+adyacente(ciudadazteca,plazaaragon,11). adyacente(plazaaragon,olimpica,11). adyacente(olimpica,ecatepec,11). adyacente(ecatepec,muzquiz,11). 
+adyacente(muzquiz,riodelosremedios,11). adyacente(riodelosremedios,impulsora,11). adyacente(impulsora,nezahualcoyotl,11). adyacente(nezahualcoyotl,villadearagon,11). 
+adyacente(villadearagon,bosquedearagon,11). adyacente(bosquedearagon,deportivooceania,11).  adyacente(deportivooceania,oceania,11). 
+adyacente(oceania,rrubio,11). adyacente(rrubio,rfloresmagon,11). adyacente(rfloresmagon,sanlazaro,11). adyacente(sanlazaro,morelos,11). 
+adyacente(morelos,tepito,11). adyacente(tepito,lagunilla,11). adyacente(lagunilla,garibaldi,11). adyacente(garibaldi,guerrero,11). adyacente(guerrero,buenavista,11). 
 % linea 12
 adyacente(mixcoac,insurgentessur,12). adyacente(insurgentessur,hospital20denoviembre,12). adyacente(hospital20denoviembre,zapata,12). adyacente(zapata,parquedelosvenados,12). 
 adyacente(parquedelosvenados,ejecentral,12). adyacente(ejecentral,ermita,12). adyacente(ermita,mexicaltzingo,12). adyacente(mexicaltzingo,atlalilco,12). 
 adyacente(atlalilco,culhuacan,12). adyacente(culhuacan,sanandrestomatlan,12). adyacente(sanandrestomatlan,lomasestrella,12). adyacente(lomasestrella,calle11,12). 
 adyacente(calle11,perifericooriente,12). adyacente(perifericooriente,tezonco,12). adyacente(tezonco,olivos,12). adyacente(olivos,nopalera,12).
-adyacente(nopalera,zapotitlan,12). adyacente(zapotitlan,tlaltengo,12). adyacente(tlaltengo,tlahuac,12). 
+adyacente(nopalera,zapotitlan,12). adyacente(zapotitlan,tlaltengo,12). adyacente(tlaltengo,tlahuac,12).
+
+%____________________________________________________________________________________________________
+% Casos:
+% El modelo 'router' toma en cuenta casos que se pueden generalizar para llegar a soluciones particulares
+
 
 
 %____________________________________________________________________________________________________
 
 
+% Predicado que relaciona a una estacion y las lineas que contecta (si las hay).
+% conexion(i,i,o)
+% conexion(i,o,i)
+% conexion(o,i,i)
+conexion(ESTACION,LINEA1,LINEA2):-
+	linea(LINEA1),
+	linea(LINEA2),
+	not(LINEA1 is LINEA2),
+	pertenece(ESTACION,LINEA1),
+	pertenece(ESTACION,LINEA2).
+
+%____________________________________________________________________________________________________
+
+
+
 
 % predicado que describe un viaje entre cualquier par de estaciones en una misma linea
-% está dividido en dos 'sub-predicados' (viajelinea y viajelineai) que checan ambas direcciones.
+% estÃ¡ dividido en dos 'sub-predicados' (viajelinea y viajelineai) que checan ambas direcciones.
 
 % viajelinea(i,i,i)
-% viajelinea(i,i,o) *nota: esta variante idealmente solamente se usaría si no hay ambiguedad en los posibles resultados de la salida
+% viajelinea(i,i,o) *nota: esta variante idealmente solamente se usarÃ­a si no hay ambiguedad en los posibles resultados de la salida
 viajelinea(E1,E2,LINEA):-
 	pertenece(E1,LINEA),
 	pertenece(E2,LINEA),
@@ -232,7 +253,7 @@ viajelinea(E1,E2,SECUENCIA,LINEA):-
 	adyacente(E1,E2,LINEA),
 	append(SECUENCIA,[E1],SACT),
 	append(SACT,[E2],SACT2),
-	write(SACT2),!.
+	write(SACT2),nl,!.
 viajelinea(E1,E2,SECUENCIA,LINEA):-
 	pertenece(E1,LINEA),
 	pertenece(E2,LINEA),
@@ -245,7 +266,7 @@ viajelineai(E2,E1,SECUENCIA,LINEA):-
 	adyacente(E1,E2,LINEA),
 	append(SECUENCIA,[E2],SACT),
 	append(SACT,[E1],SACT2),
-	write(SACT2),!.
+	write(SACT2),nl,!.
 viajelineai(E2,E1,SECUENCIA,LINEA):-
 	pertenece(E1,LINEA),
 	pertenece(E2,LINEA),
@@ -255,18 +276,37 @@ viajelineai(E2,E1,SECUENCIA,LINEA):-
 
 %____________________________________________________________________________________________________
 
+% predicado que describe el transbordo de una linea a otra indicando las estaciones de inicio y destino
+% Las lineas de inicio y destino deben tener,al menos, una estacion de transbordo en comun
 
-% Predicado que relaciona a una estacion y las lineas que contecta (si las hay).
-% conexion(i,i,o)
-% conexion(i,o,i)
-% conexion(o,i,i)
-conexion(ESTACION,LINEA1,LINEA2):-
-	linea(LINEA1),
-	linea(LINEA2),
-	LINEA1 =\= LINEA2,
-	pertenece(ESTACION,LINEA1),
-	pertenece(ESTACION,LINEA2).
+transbordo(EINICIAL,EMETA):-
+	pertenece(EINICIAL,LINICIAL),
+	pertenece(EMETA,LMETA),
+	conexion(ETRANSBORDO,LINICIAL,LMETA),
+	viajelinea(EINICIAL,ETRANSBORDO,LINICIAL),
+	viajelinea(ETRANSBORDO,EMETA,LMETA).
 
+
+% sobrecarga que indica una linea especifica por la cual se desee llegar a la estacion de meta
+% esto es en caso de que la estacion de meta pertenezca a mas de una linea
+transbordo(EINICIAL,EMETA,LPREFERENCIA):-
+	pertenece(EINICIAL,LINICIAL),
+	pertenece(EMETA,LPREFERENCIA),
+	conexion(ETRANSBORDO,LINICIAL,LPREFERENCIA),
+	viajelinea(EINICIAL,ETRANSBORDO,LINICIAL),
+	viajelinea(ETRANSBORDO,EMETA,LPREFERENCIA).
+
+%____________________________________________________________________________________________________
+
+% nota: falta solucionar error donde numeros y letras no son comparables en la funcion 'conexion'
+
+posibleconexion(LINEAINI,LINEAFIN):-
+	conexion(_,LINEAINI,LINEAFIN),
+	write(LINEAFIN),nl.
+posibleconexion(LINEAINI,LINEAFIN):-
+	conexion(_,LINEAINI,TRANSBORDO),
+	write(LINEAINI), write(" - "),
+	posibleconexion(TRANSBORDO,LINEAFIN).
 
 
 
