@@ -192,8 +192,8 @@ adyacente(tacubaya,patriotismo,9). adyacente(patriotismo,chilpancingo,9). adyace
 adyacente(lazarocardenas,chabacano,9). adyacente(chabacano,jamaica,9). adyacente(jamaica,mixiuhca,9). adyacente(mixiuhca,velodromo,9). 
 adyacente(velodromo,ciudaddeportiva,9). adyacente(ciudaddeportiva,puebla,9). adyacente(puebla,pantitlan,9). 
 % linea a (10)
-adyacente(pantitlan,10,agricolaoriental,10). adyacente(agricolaoriental,canaldesanjuan,10). adyacente(canaldesanjuan,tepalcates,10). 
-adyacente(tepalcates,guelatao,10). adyacente(guelatao,penionviejo,10). adyacente(penionviejo,10,acatitla,10). adyacente(acatitla,santamarta,10). 
+adyacente(pantitlan,agricolaoriental,10). adyacente(agricolaoriental,canaldesanjuan,10). adyacente(canaldesanjuan,tepalcates,10). 
+adyacente(tepalcates,guelatao,10). adyacente(guelatao,penionviejo,10). adyacente(penionviejo,acatitla,10). adyacente(acatitla,santamarta,10). 
 adyacente(santamarta,losreyes,10). adyacente(losreyes,lapaz,10). 
 % linea b (11)
 adyacente(ciudadazteca,plazaaragon,11). adyacente(plazaaragon,olimpica,11). adyacente(olimpica,ecatepec,11). adyacente(ecatepec,muzquiz,11). 
@@ -307,6 +307,8 @@ posibleconexion(LINEAINI,LINEAFIN):-
 	conexion(_,LINEAINI,TRANSBORDO),
 	write(LINEAINI), write(" - "),
 	posibleconexion(TRANSBORDO,LINEAFIN).
+
+
 
 
 
